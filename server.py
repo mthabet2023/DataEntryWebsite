@@ -5,7 +5,8 @@ from datetime import datetime
 import os
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
-import pickle
+import io
+import base64
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -97,21 +98,19 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             
             # Save to Google Sheets
             try:
-                # Load credentials
-                creds = None
-                if os.path.exists('token.pickle'):
-                    with open('token.pickle', 'rb') as token:
-                        creds = pickle.load(token)
+                # Load credentials from environment variable
+                creds_json = os.environ.get('GOOGLE_CREDENTIALS')
+                if not creds_json:
+                    raise ValueError('GOOGLE_CREDENTIALS environment variable is not set')
                 
-                if not creds:
-                    # Load credentials
-                    creds = Credentials.from_service_account_file(
-                        'credentials.json',
-                        scopes=['https://www.googleapis.com/auth/spreadsheets'])
-                    
-                    # Save credentials for future use
-                    with open('token.pickle', 'wb') as token:
-                        pickle.dump(creds, token)
+                # Decode the base64 credentials
+                creds_bytes = base64.b64decode(creds_json)
+                creds_info = json.loads(creds_bytes)
+                
+                # Create credentials
+                creds = Credentials.from_service_account_info(
+                    creds_info,
+                    scopes=['https://www.googleapis.com/auth/spreadsheets'])
                 
                 # Build the service
                 service = build('sheets', 'v4', credentials=creds)
