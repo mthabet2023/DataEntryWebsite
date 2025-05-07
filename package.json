@@ -1,0 +1,15 @@
+{
+  "name": "dataentrywebsite",
+  "version": "1.0.0",
+  "description": "Data Entry Website",
+  "main": "server.py",
+  "scripts": {
+    "start": "python server.py"
+  },
+  "dependencies": {
+    "google-auth": "^2.40.1",
+    "google-auth-oauthlib": "^1.2.2",
+    "google-auth-httplib2": "^0.2.0",
+    "google-api-python-client": "^2.169.0"
+  }
+}
